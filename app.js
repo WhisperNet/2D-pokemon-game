@@ -8,18 +8,7 @@ for (let i = 0; i < collision.length - 1; i += 70) {
     collisionMap.push(collision.slice(i, i + 70))
 }
 
-class Boundary {
-    constructor({ position }) {
-        this.position = position;
-        this.width = 48; // multiply zoom level reference (3X)
-        this.height = 48;
-    }
 
-    draw() {
-        ctx.fillStyle = 'rgba(255,0,0,0)';
-        ctx.fillRect(this.position.x, this.position.y, this.width, this.height)
-    }
-}
 
 const boundaries = []
 
@@ -46,37 +35,15 @@ collisionMap.forEach((row, i) => {
 })
 
 const img = new Image() //const img = new Image();
-
 img.src = './img/Pellet Town.png';
 
 const playerImage = new Image()
 playerImage.src = './img/playerDown.png'
 
-class Sprite {
-    constructor({ position, image, frames = { max: 1 } }) {
-        this.position = position
-        this.image = image
-        this.frames = frames
-        this.image.onload = () => {
-            this.width = this.image.width / this.frames.max
-            this.height = this.image.height
-        }
+const foregroundImg = new Image() //const img = new Image();
+foregroundImg.src = './img/foreground.png';
 
-    }
-    draw() {
-        ctx.drawImage(
-            this.image,
-            0,
-            0,
-            this.image.width / this.frames.max,
-            this.image.height,
-            this.position.x,
-            this.position.y,
-            this.image.width / this.frames.max,
-            this.image.height
-        )
-    }
-}
+
 
 
 
@@ -89,6 +56,8 @@ const backGround = new Sprite({
 }
 )
 
+
+
 const player = new Sprite(
     {
         image: playerImage,
@@ -100,6 +69,15 @@ const player = new Sprite(
             max: 4
         }
     }
+)
+
+const foreground = new Sprite({
+    position: {
+        x: offset.x,
+        y: offset.y,
+    },
+    image: foregroundImg
+}
 )
 
 const keys = {
@@ -123,7 +101,7 @@ const keys = {
 
 
 
-const moveable = [backGround, ...boundaries]
+const moveable = [backGround, ...boundaries, foreground]
 function rectCollide({ rect1, rect2 }) {
 
 
@@ -151,7 +129,7 @@ function animate() {
     })
 
     player.draw()
-
+    foreground.draw()
     ctx.imageSmoothingEnabled = false;
     let moving = true
     if (keys.w.press && lastPress === 'w') {
