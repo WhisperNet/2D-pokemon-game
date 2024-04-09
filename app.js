@@ -2,35 +2,104 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 canvas.width = 1024;
 canvas.height = 576;
-ctx.fillStyle = 'white';
 
-ctx.fillRect(0, 0, canvas.width, canvas.height)
+const collisionMap = []
+for (let i = 0; i < collision.length - 1; i += 70) {
+    collisionMap.push(collision.slice(i, i + 70))
+}
 
+class Boundary {
+    constructor({ position }) {
+        this.position = position;
+        this.width = 48; // multiply zoom level reference (3X)
+        this.height = 48;
+    }
+
+    draw() {
+        ctx.fillStyle = 'rgba(255,0,0,0)';
+        ctx.fillRect(this.position.x, this.position.y, this.width, this.height)
+    }
+}
+
+const boundaries = []
+
+const offset = {
+    x: -735,
+    y: -650
+}
+
+collisionMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol !== 0) {
+            boundaries.push(
+                new Boundary(
+                    {
+                        position: {
+                            x: j * 48 + offset.x,
+                            y: i * 48 + offset.y
+                        }
+                    }
+                )
+            )
+        }
+    })
+})
 
 const img = new Image() //const img = new Image();
-img.classList.add('focus')
+
 img.src = './img/Pellet Town.png';
 
 const playerImage = new Image()
 playerImage.src = './img/playerDown.png'
 
 class Sprite {
-    constructor({ position, velocity, image }) {
+    constructor({ position, image, frames = { max: 1 } }) {
         this.position = position
         this.image = image
+        this.frames = frames
+        this.image.onload = () => {
+            this.width = this.image.width / this.frames.max
+            this.height = this.image.height
+        }
+
     }
     draw() {
-        ctx.drawImage(this.image, this.position.x, this.position.y, canvas.width * 3, canvas.height * 3)
+        ctx.drawImage(
+            this.image,
+            0,
+            0,
+            this.image.width / this.frames.max,
+            this.image.height,
+            this.position.x,
+            this.position.y,
+            this.image.width / this.frames.max,
+            this.image.height
+        )
     }
 }
 
+
+
 const backGround = new Sprite({
     position: {
-        x: -630,
-        y: -515,
+        x: offset.x,
+        y: offset.y,
     },
     image: img
 }
+)
+
+const player = new Sprite(
+    {
+        image: playerImage,
+        position: {
+            x: canvas.width / 2 - (192 / 4) / 2,
+            y: canvas.height / 2 - 68 / 2,
+        },
+        frames: {
+            max: 4
+        }
+    }
 )
 
 const keys = {
@@ -52,25 +121,135 @@ const keys = {
     },
 }
 
+
+
+const moveable = [backGround, ...boundaries]
+function rectCollide({ rect1, rect2 }) {
+
+
+    return (
+        rect1.position.x + rect1.width >= rect2.position.x &&
+        rect2.position.x + rect2.width >= rect1.position.x &&
+        rect1.position.y <= rect2.position.y + rect2.height &&
+        rect1.position.y + rect1.height >= rect2.position.y
+    )
+}
 function animate() {
     window.requestAnimationFrame(animate)
 
     backGround.draw()
-    ctx.drawImage(playerImage,
-        0,
-        0,
-        playerImage.width / 4,
-        playerImage.height,
-        canvas.width / 2 - (playerImage.width / 4) / 2,
-        canvas.height / 2 - playerImage.height / 2,
-        playerImage.width / 4,
-        playerImage.height)
+    boundaries.forEach((obj) => {
+        obj.draw()
+        if (
+            rectCollide({
+                rect1: player,
+                rect2: obj
+            })
+        ) {
+            console.log("colide")
+        }
+    })
+
+    player.draw()
 
     ctx.imageSmoothingEnabled = false;
-    if (keys.w.press && lastPress === 'w') backGround.position.y += 3;
-    else if (keys.a.press && lastPress === 'a') backGround.position.x += 3;
-    else if (keys.s.press && lastPress === 's') backGround.position.y -= 3;
-    else if (keys.d.press && lastPress === 'd') backGround.position.x -= 3;
+    let moving = true
+    if (keys.w.press && lastPress === 'w') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                rectCollide({
+                    rect1: player,
+                    rect2: {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x,
+                            y: boundary.position.y + 2
+                        }
+
+                    }
+
+                })
+            ) {
+                moving = false
+                break;
+            }
+        }
+        if (moving)
+            moveable.forEach((obj) => obj.position.y += 2)
+    }
+    else if (keys.a.press && lastPress === 'a') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                rectCollide({
+                    rect1: player,
+                    rect2: {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x + 2,
+                            y: boundary.position.y
+                        }
+
+                    }
+
+                })
+            ) {
+                moving = false
+                break;
+            }
+        }
+        if (moving)
+            moveable.forEach((obj) => obj.position.x += 2)
+    }
+    else if (keys.s.press && lastPress === 's') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                rectCollide({
+                    rect1: player,
+                    rect2: {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x,
+                            y: boundary.position.y - 2
+                        }
+
+                    }
+
+                })
+            ) {
+                moving = false
+                break;
+            }
+        }
+        if (moving)
+            moveable.forEach((obj) => obj.position.y -= 2)
+    }
+    else if (keys.d.press && lastPress === 'd') {
+        for (let i = 0; i < boundaries.length; i++) {
+            const boundary = boundaries[i]
+            if (
+                rectCollide({
+                    rect1: player,
+                    rect2: {
+                        ...boundary,
+                        position: {
+                            x: boundary.position.x - 2,
+                            y: boundary.position.y
+                        }
+
+                    }
+
+                })
+            ) {
+                moving = false
+                break;
+            }
+        }
+        if (moving)
+            moveable.forEach((obj) => obj.position.x -= 2)
+    }
 
 }
 
@@ -96,7 +275,7 @@ window.addEventListener('keydown', (e) => {
             lastPress = 'd';
             break;
     }
-    console.log(keys)
+    //console.log(keys)
 })
 
 window.addEventListener('keyup', (e) => {
@@ -119,7 +298,7 @@ window.addEventListener('keyup', (e) => {
 
             break;
     }
-    console.log(keys)
+    //console.log(keys)
 })
 
 
