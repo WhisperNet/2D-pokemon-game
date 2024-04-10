@@ -8,9 +8,16 @@ for (let i = 0; i < collision.length - 1; i += 70) {
     collisionMap.push(collision.slice(i, i + 70))
 }
 
+const battleZonesMap = []
+for (let i = 0; i < battleZoneData.length - 1; i += 70) {
+    battleZonesMap.push(battleZoneData.slice(i, i + 70))
+}
+
+
 
 
 const boundaries = []
+const battleZones = []
 
 const offset = {
     x: -735,
@@ -21,6 +28,23 @@ collisionMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
         if (symbol !== 0) {
             boundaries.push(
+                new Boundary(
+                    {
+                        position: {
+                            x: j * 48 + offset.x,
+                            y: i * 48 + offset.y
+                        }
+                    }
+                )
+            )
+        }
+    })
+})
+
+battleZonesMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        if (symbol !== 0) {
+            battleZones.push(
                 new Boundary(
                     {
                         position: {
@@ -113,7 +137,7 @@ const keys = {
 
 
 
-const moveable = [backGround, ...boundaries, foreground]
+const moveable = [backGround, ...boundaries, foreground, ...battleZones]
 function rectCollide({ rect1, rect2 }) {
 
 
@@ -130,21 +154,40 @@ function animate() {
     backGround.draw()
     boundaries.forEach((obj) => {
         obj.draw()
-        if (
-            rectCollide({
-                rect1: player,
-                rect2: obj
-            })
-        ) {
-            console.log("colide")
-        }
     })
 
+    battleZones.forEach((obj) => obj.draw())
     player.draw()
     foreground.draw()
     ctx.imageSmoothingEnabled = false;
     let moving = true
     player.moving = false
+    if (keys.w.press || keys.a.press || keys.s.press || keys.d.press) {
+        for (let i = 0; i < battleZones.length; i++) {
+            const battleBlock = battleZones[i]
+            const overlap = ((Math.min(
+                player.position.x + player.width,
+                battleBlock.position.x + battleBlock.width))
+                - Math.max(
+                    player.position.x, battleBlock.position.x))
+                *
+                (
+                    Math.min(
+                        player.position.y + player.height,
+                        battleBlock.position.y + battleBlock.height) - Math.max(player.position.y, battleBlock.position.y))
+            if (
+                rectCollide({
+                    rect1: player,
+                    rect2: battleBlock
+
+                }) && overlap > ((player.width * player.height) / 2)
+                && Math.random() <= 0.01
+            ) {
+                console.log("collision")
+                break;
+            }
+        }
+    }
     if (keys.w.press && lastPress === 'w') {
         player.moving = true
         player.image = player.sprites.up
