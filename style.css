@@ -1,5 +1,6 @@
 body {
     background-color: black;
+    font-family: "Press Start 2P", system-ui;
 }
 
 .focus {
@@ -23,4 +24,52 @@ section {
     left: 0;
     pointer-events: none;
     opacity: 0;
+}
+
+#attack {
+    background-color: whitesmoke;
+    display: inline-block;
+    position: absolute;
+    height: 135px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-top: 5px solid black;
+    display: flex;
+
+}
+
+#attack div:nth-of-type(1) {
+    width: 66.6%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+button {
+    border: 0;
+    font-size: 16px;
+    font-family: "Press Start 2P", system-ui;
+}
+
+button:nth-of-type(1):hover {
+    background-color: aqua;
+    cursor: pointer;
+}
+
+button:nth-of-type(2):hover {
+    background-color: crimson;
+    cursor: pointer;
+}
+
+#attack div:nth-of-type(2) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 33.33%;
+    border-left: 5px solid black;
+}
+
+#attack h1 {
+    margin: 0;
+    font-size: 20px;
 }
