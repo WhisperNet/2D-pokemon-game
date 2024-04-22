@@ -71,6 +71,16 @@ class Monster extends Sprite {
         this.health = 100
         this.attacks = attacks
     }
+
+    faint() {
+        document.querySelector('#dialougeBox').innerHTML = this.name + ' Fainted'
+        gsap.to(this.position, {
+            y: this.position.y + 20
+        })
+        gsap.to(this, {
+            opacity: 0
+        })
+    }
     attack({ attack, recv, battleSprites }) {
         document.querySelector('#dialougeBox').style.display = 'block'
         document.querySelector('#dialougeBox').innerHTML = this.name + ' used ' + attack.name
@@ -84,7 +94,6 @@ class Monster extends Sprite {
             if (this.isEnemy) attackmovement = -20
 
             const tl = gsap.timeline()
-            console.log(this.health)
             tl.to(this.position, {
                 x: this.position.x - attackmovement
             })
@@ -152,7 +161,6 @@ class Monster extends Sprite {
                         duration: 0.08
                     })
                     battleSprites.splice(1, 1)
-                    console.log(emby.health, draggle.health)
                 }
             })
         }

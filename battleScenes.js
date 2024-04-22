@@ -34,7 +34,7 @@ function battleAnimate() {
     //console.log("animating new battle")
 }
 const queue = []
-//animate()
+animate()
 battleAnimate()
 document.querySelectorAll('button').forEach(button => {
     button.addEventListener('click', (e) => {
@@ -44,18 +44,37 @@ document.querySelectorAll('button').forEach(button => {
             recv: draggle,
             battleSprites
         })
+        if (draggle.health <= 25) {
+            queue.push(() => {
+                draggle.faint()
+            })
+            return
+        }
+
+        randAttack = draggle.attacks[Math.floor(Math.random() * draggle.attacks.length)]
         queue.push(() => {
             draggle.attack({
-                attack: attacks.Tackle,
+                attack: randAttack,
                 recv: emby,
                 battleSprites
             })
+            if (emby.health <= 25) {
+                queue.push(() => {
+                    emby.faint()
+                })
+                return
+            }
         })
+    })
+    button.addEventListener('mouseenter', e => {
+        const selectedAttack = attacks[e.currentTarget.innerHTML]
+        document.querySelector('#attack h1').innerHTML = selectedAttack.type
+        document.querySelector('#attack h1').style.color = selectedAttack.color
+
     })
 })
 
 document.querySelector('#dialougeBox').addEventListener('click', e => {
-    console.log("CLICK")
     if (queue.length > 0) {
         queue[0]()
         queue.shift()

@@ -52,12 +52,12 @@ button {
 }
 
 button:nth-of-type(1):hover {
-    background-color: aqua;
+    background-color: gainsboro;
     cursor: pointer;
 }
 
 button:nth-of-type(2):hover {
-    background-color: crimson;
+    background-color: gainsboro;
     cursor: pointer;
 }
 
@@ -83,4 +83,5 @@ button:nth-of-type(2):hover {
     background-color: white;
     padding: 16px;
     display: none;
+    cursor: pointer;
 }
