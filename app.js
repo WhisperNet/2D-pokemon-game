@@ -190,6 +190,11 @@ function animate() {
                 && Math.random() <= 0.01
             ) {
                 window.cancelAnimationFrame(animationId)
+
+                audio.Map.stop()
+                audio.InitBattle.play()
+                audio.Battle.play()
+
                 battle.initiated = true;
                 console.log("Battle Activated")
                 gsap.to('#animate', {
@@ -375,5 +380,12 @@ window.addEventListener('keyup', (e) => {
     //console.log(keys)
 })
 
+let clicked = false
+window.addEventListener('keydown', () => {
+    if (!clicked) {
+        audio.Map.play()
+        clicked = true
+    }
+})
 
 

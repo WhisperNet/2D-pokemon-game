@@ -1,5 +1,5 @@
 body {
-    background-color: black;
+    background-color: #d9ed92;
     font-family: "Press Start 2P", system-ui;
 }
 
@@ -8,6 +8,14 @@ body {
     image-rendering: pixelated;
     width: auto;
     height: auto;
+}
+
+main {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
 }
 
 section {

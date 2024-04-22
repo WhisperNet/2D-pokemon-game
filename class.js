@@ -81,6 +81,8 @@ class Monster extends Sprite {
         gsap.to(this, {
             opacity: 0
         })
+        audio.Battle.stop()
+        audio.victory.play()
     }
     attack({ attack, recv, battleSprites }) {
         document.querySelector('#dialougeBox').style.display = 'block'
@@ -102,6 +104,7 @@ class Monster extends Sprite {
                     x: this.position.x + attackmovement * 2,
                     duration: 0.1,
                     onComplete: () => {
+                        audio.tackleHit.play()
                         gsap.to(target, {
                             width: recv.health - attack.damage + '%'
                         })
@@ -124,7 +127,7 @@ class Monster extends Sprite {
                     x: this.position.x
                 })
         } else {
-
+            audio.initFireball.play()
             const fireballImg = new Image()
             fireballImg.src = './img/fireball.png'
             const fireball = new Sprite({
@@ -145,6 +148,7 @@ class Monster extends Sprite {
                 x: recv.position.x,
                 y: recv.position.y,
                 onComplete: () => {
+                    audio.fireBallHit.play()
                     gsap.to(target, {
                         width: recv.health - attack.damage + '%'
                     })
