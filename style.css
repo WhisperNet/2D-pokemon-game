@@ -24,6 +24,7 @@ section {
     left: 0;
     pointer-events: none;
     opacity: 0;
+    z-index: 10;
 }
 
 #attack {

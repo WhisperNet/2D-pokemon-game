@@ -10,69 +10,112 @@ const battleBackground = new Sprite(
     }
 )
 
-const draggle = new Monster(
-    monsters.draggle
-)
+let draggle
+let emby
+let battleSprites
+let queue = []
+let battleAnimateId = null
 
+function initBattle() {
+    document.querySelector('#ui').style.display = 'block'
+    document.querySelector('#dialougeBox').style.display = 'none'
+    document.querySelector('#enemy').style.width = '100%'
+    document.querySelector('#player').style.width = '100%'
+    document.querySelector('#attackBox').replaceChildren()
+    draggle = new Monster(
+        monsters.draggle
+    )
+    emby = new Monster(
+        monsters.emby
+    )
+    battleSprites = [draggle, emby]
+    queue = []
+    emby.attacks.forEach(attack => {
+        const button = document.createElement('button')
+        button.innerHTML = attack.name
+        document.querySelector("#attackBox").append(button)
+    })
+    document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const selectedAttack = attacks[e.currentTarget.innerHTML]
+            emby.attack({
+                attack: selectedAttack,
+                recv: draggle,
+                battleSprites
+            })
+            if (draggle.health <= 25) {
+                queue.push(() => {
+                    draggle.faint()
+                })
+                queue.push(() => {
+                    gsap.to('#animate', {
+                        opacity: 1,
+                        onComplete: () => {
+                            cancelAnimationFrame(battleAnimateId)
+                            animate()
+                            document.querySelector('#ui').style.display = 'none'
+                            gsap.to("#animate", {
+                                opacity: 0
+                            })
+                            battle.initiated = false
+                        }
+                    })
+                })
+                // return
+            }
 
-const emby = new Monster(
-    monsters.emby
-)
+            randAttack = draggle.attacks[Math.floor(Math.random() * draggle.attacks.length)]
+            queue.push(() => {
+                draggle.attack({
+                    attack: randAttack,
+                    recv: emby,
+                    battleSprites
+                })
+                if (emby.health <= 25) {
+                    queue.push(() => {
+                        emby.faint()
 
-const battleSprites = [draggle, emby]
-emby.attacks.forEach(attack => {
-    const button = document.createElement('button')
-    button.innerHTML = attack.name
-    document.querySelector("#attackBox").append(button)
-})
+                    })
+                    queue.push(() => {
+                        gsap.to('#animate', {
+                            opacity: 1,
+                            onComplete: () => {
+                                cancelAnimationFrame(battleAnimateId)
+                                animate()
+                                document.querySelector('#ui').style.display = 'none'
+                                gsap.to("#animate", {
+                                    opacity: 0
+                                })
+                                battle.initiated = false
+                            }
+                        })
+                    })
+                    // return
+                }
+            })
+        })
+        button.addEventListener('mouseenter', e => {
+            const selectedAttack = attacks[e.currentTarget.innerHTML]
+            document.querySelector('#attack h1').innerHTML = selectedAttack.type
+            document.querySelector('#attack h1').style.color = selectedAttack.color
+
+        })
+    })
+}
+
 
 function battleAnimate() {
-    window.requestAnimationFrame(battleAnimate)
+    battleAnimateId = window.requestAnimationFrame(battleAnimate)
+    console.log(battleAnimateId)
     battleBackground.draw()
 
     battleSprites.forEach(sprite => sprite.draw())
     //console.log("animating new battle")
 }
-const queue = []
-animate()
+
+//animate()
+initBattle()
 battleAnimate()
-document.querySelectorAll('button').forEach(button => {
-    button.addEventListener('click', (e) => {
-        const selectedAttack = attacks[e.currentTarget.innerHTML]
-        emby.attack({
-            attack: selectedAttack,
-            recv: draggle,
-            battleSprites
-        })
-        if (draggle.health <= 25) {
-            queue.push(() => {
-                draggle.faint()
-            })
-            return
-        }
-
-        randAttack = draggle.attacks[Math.floor(Math.random() * draggle.attacks.length)]
-        queue.push(() => {
-            draggle.attack({
-                attack: randAttack,
-                recv: emby,
-                battleSprites
-            })
-            if (emby.health <= 25) {
-                queue.push(() => {
-                    emby.faint()
-                })
-                return
-            }
-        })
-    })
-    button.addEventListener('mouseenter', e => {
-        const selectedAttack = attacks[e.currentTarget.innerHTML]
-        document.querySelector('#attack h1').innerHTML = selectedAttack.type
-        document.querySelector('#attack h1').style.color = selectedAttack.color
-
-    })
-})
 
 document.querySelector('#dialougeBox').addEventListener('click', e => {
     if (queue.length > 0) {
