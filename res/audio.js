@@ -17,11 +17,11 @@ const audio = {
     }),
     fireBallHit: new Howl({
         src: '/res/Audio/fireBallHit.wav',
-        volume: 0.5
+        volume: 0.3
     }),
     initFireball: new Howl({
         src: '/res/Audio/initFireball.wav',
-        volume: 0.5
+        volume: 0.3
     }),
     victory: new Howl({
         src: '/res/Audio/victory.wav',
