@@ -26,8 +26,7 @@ I recently completed an exciting project following [this tutorial](https://youtu
 
 ## Screen Recording
 Check out the screen recording of the game in action:
-[Youtube Link]
-(https://youtu.be/DmcZoiUcVdw?si=N-2Pru4o9zXOLUNX)
+[Youtube Link](https://youtu.be/DmcZoiUcVdw?si=N-2Pru4o9zXOLUNX)
 
 ## Controls 
 - Use W A S D to move around 
