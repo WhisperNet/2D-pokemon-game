@@ -18,7 +18,7 @@ I recently completed an exciting project following [this tutorial](https://youtu
 ## How to Play
 1. Clone the repository.
    ```bash
-   git clone [https://github.com/WhisperNet/2D-pokemon-game.git]
+   git clone https://github.com/WhisperNet/2D-pokemon-game.git
    ```
 2. Open `index.html` in your preferred web browser.
 3. Or follow this [live demo](https://js-2d-pokemon-game.netlify.app/) (This may take some time to load)
